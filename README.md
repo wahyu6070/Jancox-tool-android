@@ -27,8 +27,8 @@
 - python : based termux
 
 jancox-tool
-linux   : 
-android :
+linux   : https://github.com/Wahyu6070/Jancox-tool-linux
+android : https://github.com/Wahyu6070/Jancox-tool-android
 windows :
 youtube (guide) : https://www.youtube.com/c/wahyu6070
 

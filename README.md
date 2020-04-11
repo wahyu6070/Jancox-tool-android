@@ -26,11 +26,11 @@
 - img2sdat/sdat2img : https://github.com/xpirt/img2sdat
 - python : based termux
 
-jancox-tool
-linux   : https://github.com/Wahyu6070/Jancox-tool-linux
-android : https://github.com/Wahyu6070/Jancox-tool-android
-windows :
-youtube (guide) : https://www.youtube.com/c/wahyu6070
+# jancox-tool
+- linux   : https://github.com/Wahyu6070/Jancox-tool-linux
+- android : https://github.com/Wahyu6070/Jancox-tool-android
+- windows :
+- youtube (guide) : https://www.youtube.com/c/wahyu6070
 
 ## Supports
 - [Youtube](https://www.youtube.com./c/wahyu6070)

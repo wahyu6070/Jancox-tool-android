@@ -28,13 +28,13 @@ mkdir -p $tmp
 if [ $internet = online ]; then
 rm -rf $tmp/module.prop
 rm -rf $tmp/changelog
-wget -O $tmp/module.prop https://raw.githubusercontent.com/Wahyu6070/Pingger-Stable-For-Game/master/module.prop >&2
+wget -O $tmp/module.prop https://raw.githubusercontent.com/Wahyu6070/Jancox-tool-android/master/module.prop >&2
 sleep 1s
    if [ $(upinfo versionCode) -gt $MODULECODE ]; then
    ui_print "----> New Version Anvailable <------"
    ui_print "Version = $(upinfo version)"
    ui_print "Date    = $(upinfo date)"
-   wget -O $tmp/changelog https://raw.githubusercontent.com/Wahyu6070/Pingger-Stable-For-Game/master/changelog >&2
+   wget -O $tmp/changelog https://raw.githubusercontent.com/Wahyu6070/Jancox-tool-android/master/changelog >&2
    cat $tmp/changelog
    ui_print " "
    fi

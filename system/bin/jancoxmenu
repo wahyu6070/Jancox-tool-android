@@ -1,0 +1,274 @@
+#!/system/bin/sh
+#Jancox Menu by wahyu6070
+#15/07/2020 - 15/07/2029
+
+
+GREEN='\e[01;32m'
+RED='\e[01;31m'
+YELLOW='\e[01;33m'
+BLUE='\e[01;34m'
+VIOLET='\e[01;35m'
+BLACK='\e[01;30m'
+CYAN='\e[01;36m'
+WHITE='\e[01;37m'
+BGBL='\e[1;30;47m'
+
+
+
+print (){ echo "$1"; }
+del (){ rm -rf "$@"; }
+cdir (){ mkdir -p " $@"; }
+getp(){ grep "^$1" "$2" | head -n1 | cut -d = -f 2; }
+abort (){
+	print " "
+	print "${RED}!!! $1${GREEN}";
+	sleep 4s;
+	print " "
+	exit 1
+	}
+error (){
+	print " "
+	print "${RED}!!! $1${GREEN}";
+	print " "
+	}
+printmid() {
+  local CHAR=$(printf "$@" | sed 's|\\e[[0-9;]*m||g' | wc -m)
+  local hfCOLUMN=$((COLUMNS/2))
+  local hfCHAR=$((CHAR/2))
+  local indent=$((hfCOLUMN-hfCHAR))
+  echo "$(printf '%*s' "${indent}" '') $@"
+}
+
+
+jancox=/data/local/jancox-tool
+editor=$jancox/editor
+jancoxversion=2.2
+jancoxdate=17-07-2020
+cd $jancox
+
+
+
+if [ ! -f "$jancox/unpack.sh" ]; then
+abort "Jancox Tool Not Installed"
+elif [ -f "$jancox/unpack.sh" ] && [ ! -d $editor ]; then
+abort "Please unpack for using this tool"
+fi
+
+if [ -f $editor/system/system/build.prop ]; then
+system=$editor/system/system
+sysroot=true
+else
+sysroot=false
+system=$editor/system
+fi
+vendor=$editor/vendor
+
+listdebloatdir="
+Babe
+Duo
+DMClient
+Drive
+DriveActivator
+Duo
+Facebook
+facebook-appmanager
+FacebookMessenger
+Gmail2
+GooglePay
+Instagram
+Lazada
+mangaDeals
+Maps
+Music2
+MyASUS
+Photos
+Shopee
+Videos
+YouTube
+YandexApp
+YandexBrowser
+Velvet
+facebook-installer
+LauncherRes
+"
+
+
+
+
+
+#functions menu
+
+
+menu(){
+	while true; do
+	clear
+	printmid "$BLUE $2 $GREEN"
+	print
+	$1
+	print
+	print "1.Back To Menu      2.Refresh"
+	print
+	echo -n "Select menu : "
+	read anjay
+	if [ $anjay -eq 1 ]; then
+	break
+	elif [ $anjay -eq 2 ]; then print;
+	else
+	print
+	error "Please select 1 or 2"
+	print
+	sleep 2s
+	fi
+	done
+}
+
+debloating_auto (){
+	#debloating auto folder
+	for i1 in $(find $system -type d); do
+	  case $i1 in
+	   *priv-app)
+	      for i2 in $listdebloatdir ; do
+	         if [ -d $i1/$i2 ]; then
+	         print "- Debloating $i2"
+	         del $i1/$i2
+	         fi
+	      done
+	   ;;
+	   *app)
+	      for i2 in $listdebloatdir ; do
+	         if [ -d $i1/$i2 ]; then
+	         print "- Debloating $i2"
+	         del $i1/$i2
+	         fi
+	      done
+	   ;;
+   	*etc)
+	      for i2 in $listdebloatdir ; do
+	         if [ -d $i1/$i2 ]; then
+	         print "- Debloating $i2"
+	         del $i1/$i2
+	         fi
+	      done
+	   ;;
+   	esac
+	done
+  print "- Done"
+}
+#
+debloating () {
+while true ; do
+clear
+printmid "Debloating Menu"
+print " "
+print "1.Debloat auto"
+print "2.Exit"
+print " "
+echo -n "Select Menu : "
+read deb
+case $deb in
+1)
+menu debloating_auto Debloating auto
+;;
+2)
+break
+;;
+*)
+error " $deb Menu Not found"
+sleep 3s
+;;
+esac
+done
+}
+dm_verity(){
+	
+	
+	print " "
+	
+	
+	}
+
+about (){
+#
+print "$CYAN "
+print "Jancox Tool Menu v$jancoxversion ($jancoxdate)"
+print "Copyright (C) 2020 wahyu kurniawan (wahyu6070)."
+print "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>."
+print "This is free software: you are free to change and redistribute it."
+print "There is NO WARRANTY, to the extent permitted by law."
+print "${YELLOW}"
+print " Github  : https://github.com/wahyu6070 "
+print " Youtube : https://www.youtube.com/c/wahyu6070 "
+print " Xda     : @wahyu6070 "
+print " Telegram: https://t.me/wahyu6070group"
+print " $GREEN"
+}
+
+
+#
+# Core menu
+#
+
+
+if [[ "$(grep secure=0 $editor/vendor/default.prop)" ]]; then dmverity=true;
+elif [[ "$(grep forceencrypt $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep forcefdeorfbe $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep fileencryption $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep .dmverity=true $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep fileencryption $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+#elif [ -f $editor2/$system/recovery-from-boot.p ]; then dmverity=true;
+else
+dmverity=false
+fi;
+
+
+
+while true ; do
+clear
+print " "
+print "$GREEN";
+printmid "$CYAN Jancox ${VIOLET}Tool ${WHITE}Menu"$GREEN
+print " "
+print " "
+print "- Android Version = $(getp ro.build.version.release $editor2/$system/build.prop) "
+print "- Name ROM        = $(getp ro.build.display.id $editor2/$system/build.prop) "
+print "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
+print "- System as-root  = $sysroot "
+print "- Dm-verity       = $dmverity "
+print " "
+print "1.Debloating"
+print "2.Disable Dm-verity"
+print "3.About"
+print "4.Exit"
+print
+echo -n " Select menu : "
+read menus
+case $menus in
+1)
+print " "
+debloating
+;;
+2)
+print " "
+;;
+3)
+menu about About
+;;
+4)
+break
+;;
+*)
+error "$menus Menu not found"
+sleep 3s
+;;
+esac
+done
+
+
+
+
+
+
+
+
+
+

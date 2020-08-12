@@ -1,0 +1,8 @@
+id=jancox-tool
+name=Jancox-tool Android
+version=2.2
+versionCode=22
+date=12-08-2020
+author=wahyu6070 @xda-developers
+description=Jancox tool is a tool for unpack/repack roms.
+minMagisk=1500

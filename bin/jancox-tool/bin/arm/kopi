@@ -1,0 +1,198 @@
+####################################
+#         Kopi Functions           #
+####################################
+#          By : wahyu6070          #
+####################################
+print(){
+	echo "$1"
+	}
+	
+printlog(){
+	print "$1"
+	if [ "$1" != " " ]; then
+	print "$1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $log
+	print "$1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $loglive
+	else
+	print "$1" >> $log
+	print "$1" >> $loglive
+	fi
+	}
+sedlog(){
+	print "[Processing]  $1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $log
+	print "[Processing]  $1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $loglive
+	}
+	
+	
+#
+while_log(){
+	print "$1" | tee -a $log
+	}
+listlog(){
+	print " " >> $log
+	print "▒▒▒▒▒▒▒▒▒▒▒▒▒ Folder List : $1 ▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $log
+	print " " >> $loglive
+	print "▒▒▒▒▒▒▒▒▒▒▒▒▒ Folder List : $1 ▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $loglive
+	find "$1" -type f | while read lol; do
+	while_log "▒ $(du -sah $lol | cut -f 1) ▒ $lol"
+	done >> $loglive
+	print "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $log
+	print " " >> $log
+	print "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $loglive
+	print " " >> $loglive
+	}
+
+getp(){ grep "^$1" "$2" | head -n1 | cut -d = -f 2; }
+
+loadings() {
+  PID=$!
+  a=0;
+  while [ -d /proc/$PID ]; do
+    b=$((+1))
+    a=$((a+1))
+    sleep 0.9s
+    printf "\r${@} [${a}Second]"
+  done
+}
+
+loadingm() {
+  PID=$!
+  a=0
+  while [ -d /proc/$PID ]; do
+    b=$((a+1))
+    a=$((h+1))
+    sleep 59.9s
+    printf "\r${@} [${b}Minutes]"
+  done
+}
+
+loadingz() {
+  PID=$!
+  a=0
+  while [ -d /proc/$PID ]; do
+    b=$((a+1))
+    a=$((a+1))
+    sleep 0.9s
+    printf "#"
+  done
+}
+
+printmid() {
+  local CHAR=$(printf "$@" | sed 's|\\e[[0-9;]*m||g' | wc -m)
+  local hfCOLUMN=$((COLUMNS/2))
+  local hfCHAR=$((CHAR/2))
+  local indent=$((hfCOLUMN-hfCHAR))
+  echo "$(printf '%*s' "${indent}" '') $@"
+}
+
+
+
+setime(){
+	if [[ $1 == '-f' ]] && [ "$2" ] && [ $3 -eq $3 ]; then
+	   if [ -f "$2" ]; then
+	      touch -ct $3 "$2" 2>/dev/null || echo "setime: bad '$3': Value too large for defined data type"
+	   else
+	      echo "setime: $2: Is not file"
+	   fi
+	elif [[ $1 == '-r' ]] && [ "$2" ] && [ $3 -eq $3 ]; then
+	   if [ -d "$2" ]; then
+	      find "$2" -print | while read filename; do
+	      touch -ct $3 "$filename" 2>/dev/null || echo "setime: bad '$3': Value too large for defined data type"
+	      done
+	   else
+	      echo "setime: $2: Is not directory"
+	   fi
+	elif [[ $1 == '--version' ]] || [[ $1 == '-v' ]]; then
+	echo "setime v1.0 Copyright (C) 2020 wahyu kurniawan (wahyu6070)."
+    elif [[ $1 == '--help' ]] || [[ $1 == '-h' ]]; then
+    echo "usage : setime <options> <input> <datetime>"
+    echo " "
+    echo "example : setime -r /sdcard/download 202004081503"
+    echo " "
+    echo "options"
+    echo "-f                    file"
+    echo "-r                    change all directory and file"
+    echo "-v, --version         version"
+    echo "-h, --help            help"
+    echo " "
+    echo "setime v1.0 since 2020-04-09 Copyright (C) 2020 wahyu kurniawan (wahyu6070)."
+    else
+    echo "usage : setime --help"
+    fi
+}
+
+
+bash_color(){
+G='\e[01;32m'		# GREEN TEXT
+R='\e[01;31m'		# RED TEXT
+Y='\e[01;33m'		# YELLOW TEXT
+B='\e[01;34m'		# BLUE TEXT
+V='\e[01;35m'		# VIOLET TEXT
+Bl='\e[01;30m'		# BLACK TEXT
+C='\e[01;36m'		# CYAN TEXT
+W='\e[01;37m'		# WHITE TEXT
+BGBL='\e[1;30;47m'	# Background W Text Bl
+N='\e[0m'			# How to use (example): echo "${G}example${N}"
+}
+
+abort(){
+	print " " | tee -a $log | tee -a $loglive
+	print "!!! $1" | tee -a $log | tee -a $loglive
+	print " " | tee -a $log | tee -a $loglive
+	exit 1
+	}
+	
+#
+del (){ rm -rf "$@"; }
+cdir (){ mkdir -p "$@"; }
+
+
+#jancox
+rom-info (){
+	editor2=$1
+if [ -f $editor2/system/system/build.prop ]; then
+system=system/system
+systemroot=true
+else
+system=system
+systemroot=false
+fi;
+
+if [[ "$(grep secure=0 $editor2/vendor/default.prop)" ]]; then dmverity=true;
+elif [[ "$(grep forceencrypt $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep forcefdeorfbe $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep fileencryption $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep .dmverity=true $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+elif [[ "$(grep fileencryption $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
+#elif [ -f $editor2/$system/recovery-from-boot.p ]; then dmverity=true;
+else
+dmverity=false
+fi;
+echo "- Android Version = $(getp ro.build.version.release $editor2/$system/build.prop) "
+echo "- Name ROM        = $(getp ro.build.display.id $editor2/$system/build.prop) "
+echo "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
+echo "- System as-root  = $systemroot "
+echo "- Dm-verity       = $dmverity "
+print " "
+}
+if [ $(uname -m) = *x86* ]; then
+ARCH32=x86
+else
+ARCH32=arm
+fi
+
+clog(){
+	#create log
+	sedlog "compress log"
+	cdir $jancox/bin/log
+	cp -pf $jancox/bin/jancox.log $jancox/bin/log/ || sedlog "Failed cp jancox.log"
+	cp -pf $jancox/bin/jancox.live.log $jancox/bin/log/ || sedlog "Failed cp jancox.live.log"
+	cp -pf $editor/$system/build.prop $jancox/bin/log/sys_rom_build.prop || sedlog "Failed cp $editor/$system/build.prop"
+	cp -pf $editor/vendor/build.prop $jancox/bin/log/ven_rom_build.prop || sedlog "Failed cp /$editor/vendor/build.prop"
+	cp -pf /system/build.prop $jancox/bin/log/sys_device_build.prop || sedlog "Failed cp /system/build.prop"
+	cp -pf /vendor/build.prop $jancox/bin/log/ven_device_build.prop || sedlog "Failed cp /vendor/build.prop"
+	[ -f $jancox/bin/jancox_log.tar.7z ] && del $jancox/bin/jancox_log.tar.7z
+	$bin/7za a -t7z $jancox/bin/jancox_log.7z $jancox/bin/log/* || sedlog "Failed Creating jancox_log.7z"
+	del $jancox/bin/log
+	}
+	
+	

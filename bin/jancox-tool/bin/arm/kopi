@@ -157,42 +157,61 @@ system=system
 systemroot=false
 fi;
 
-if [[ "$(grep secure=0 $editor2/vendor/default.prop)" ]]; then dmverity=true;
-elif [[ "$(grep forceencrypt $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep forcefdeorfbe $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep fileencryption $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep .dmverity=true $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep fileencryption $editor2/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-#elif [ -f $editor2/$system/recovery-from-boot.p ]; then dmverity=true;
+if [ -d $editor2/vendor ]; then
+	for GREP_VERITY in forceencrypt forcefdeorfbe fileencryption .dmverity=true fileencryption; do
+		[[ "$(grep $GREP_VERITY $editor2/vendor/etc/fstab.qcom)" ]] && DMVERITY=true
+	done
+	if [[ "$(grep secure=0 $editor2/vendor/default.prop)" ]]; then DMVERITY=true;
+	#elif [ -f $editor2/$system/recovery-from-boot.p ]; then DMVERITY=true;
 else
-dmverity=false
+DMVERITY=false
 fi;
 echo "- Android Version = $(getp ro.build.version.release $editor2/$system/build.prop) "
 echo "- Name ROM        = $(getp ro.build.display.id $editor2/$system/build.prop) "
 echo "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
 echo "- System as-root  = $systemroot "
-echo "- Dm-verity       = $dmverity "
+echo "- Dm-verity       = $DMVERITY "
 print " "
 }
+
+
+clog(){
+	if [ -f $editor2/system/system/build.prop ]; then
+	system=system/system
+	systemroot=true
+	else
+	system=system
+	systemroot=false
+	fi;
+	#create log
+	sedlog "compress log"
+	cdir $jancox/bin/log
+	for $LOG1 in $jancox/bin/jancox.log $jancox/bin/jancox.live.log; do
+	   [ -f $LOG1 ] && cp -pf $LOG1 $jancox/bin/log/ || sedlog "Failed cp $LOG1"
+	done
+	if [ -f $editor/$system/build.prop ]; then
+	    cp -pf $editor/$system/build.prop $jancox/bin/log/sys_rom_build.prop || sedlog "Failed cp $editor/$system/build.prop"
+	fi
+	if [ -f $editor/vendor/build.prop ]; then
+		cp -pf $editor/vendor/build.prop $jancox/bin/log/ven_rom_build.prop || sedlog "Failed cp /$editor/vendor/build.prop"
+	fi
+	if [ -f /system/build.prop ]; then
+		cp -pf /system/build.prop $jancox/bin/log/sys_device_build.prop || sedlog "Failed cp /system/build.prop"
+	fi
+	if [ -f /vendor/build.prop ]; then
+		cp -pf /vendor/build.prop $jancox/bin/log/ven_device_build.prop || sedlog "Failed cp /vendor/build.prop"
+	fi
+	[ -f $jancox/bin/jancox_log.tar.7z ] && del $jancox/bin/jancox_log.tar.gz
+	cd  $jancox/bin/log
+	$bin/busybox tar -cz -f $jancox/bin/jancox_log.tar.gz * || sedlog "Failed Creating jancox_log.tar.gz"
+	del $jancox/bin/log
+	cd $jancox
+	}
+	
+	
+#dec
 if [ $(uname -m) = *x86* ]; then
 ARCH32=x86
 else
 ARCH32=arm
 fi
-
-clog(){
-	#create log
-	sedlog "compress log"
-	cdir $jancox/bin/log
-	cp -pf $jancox/bin/jancox.log $jancox/bin/log/ || sedlog "Failed cp jancox.log"
-	cp -pf $jancox/bin/jancox.live.log $jancox/bin/log/ || sedlog "Failed cp jancox.live.log"
-	cp -pf $editor/$system/build.prop $jancox/bin/log/sys_rom_build.prop || sedlog "Failed cp $editor/$system/build.prop"
-	cp -pf $editor/vendor/build.prop $jancox/bin/log/ven_rom_build.prop || sedlog "Failed cp /$editor/vendor/build.prop"
-	cp -pf /system/build.prop $jancox/bin/log/sys_device_build.prop || sedlog "Failed cp /system/build.prop"
-	cp -pf /vendor/build.prop $jancox/bin/log/ven_device_build.prop || sedlog "Failed cp /vendor/build.prop"
-	[ -f $jancox/bin/jancox_log.tar.7z ] && del $jancox/bin/jancox_log.tar.7z
-	$bin/7za a -t7z $jancox/bin/jancox_log.7z $jancox/bin/log/* || sedlog "Failed Creating jancox_log.7z"
-	del $jancox/bin/log
-	}
-	
-	

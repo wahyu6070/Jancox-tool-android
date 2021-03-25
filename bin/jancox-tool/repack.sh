@@ -64,14 +64,14 @@ sedlog "vendor size = $size2"
 fi;
 
 
-if [ -f $tmp/system.img ]; then
+if [ -f $tmp/system.img ] && [ $(getp compress.dat $profile) = true ]; then
 printlog "- Repack system.img"
 [ -f $tmp/system.new.dat ] && rm -rf $tmp/system.new.dat
 $py $pybin/img2sdat.py $tmp/system.img -o $tmp -v 4 >> $loglive
 [ -f $tmp/system.img ] && rm -rf $tmp/system.img
 fi
 
-if [ -f $tmp/vendor.img ]; then
+if [ -f $tmp/vendor.img ] && [ $(getp compress.dat $profile) = true ]; then
 printlog "- Repack vendor.img"
 [ -f $tmp/vendor.new.dat ] && rm -rf $tmp/vendor.new.dat
 $py $pybin/img2sdat.py $tmp/vendor.img -o $tmp -v 4 -p vendor >> $loglive

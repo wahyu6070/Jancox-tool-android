@@ -1,5 +1,5 @@
 #!/system/bin/sh
-#jancox-tool
+#jancox-tool-android
 #by wahyu6070
 jancox=/data/local/jancox-tool
 print (){ echo "$1"; }
@@ -16,6 +16,9 @@ sudo $jancox/repack.sh
 --cleanup | cleanup | cleanup.sh | c)
 sudo $jancox/cleanup.sh
 ;;
+--menu | menu | m)
+sudo jancoxmenu
+;;
 --credit | credit | --credits | credits)
 if [ -f $jancox/credits.txt ]; then
 print "Credits :"
@@ -29,17 +32,18 @@ fi
 print " usage : jancox <applets>"
 print " "
 print "APPLETS :"
-print "unpack            -> for unpack rom"
-print "repack            -> for repack rom"
-print "cleanup           -> for clean files"
-print "credit            -> credit from the jancox tool project"
-print "help              -> for help"
+print "unpack            Unpack rom"
+print "repack            Repack rom"
+print "cleanup           Cleaning files"
+print "menu              Jancox features menu"
+print "credit            Credit from jancox tool project"
+print "help              About"
 print " "
 print "example : jancox unpack"
 print " "
 print "Note : You must change your ROM to (input.zip), then move it to $jancox or /sdcard"
 print " "
-print "Jancox Tool 2.2 2019-10-03 2020-08-12 by wahyu6070"
+print "Jancox Tool 2.3 2019-10-03 2021-03-26 by wahyu6070"
 print " "
 ;;
 *) cd $jancox ;su;

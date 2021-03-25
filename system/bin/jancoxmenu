@@ -1,6 +1,6 @@
 #!/system/bin/sh
 #Jancox Menu by wahyu6070
-#15/07/2020 - 15/07/2029
+#15/07/2020 - 26/03/2021
 
 
 GREEN='\e[01;32m'
@@ -42,8 +42,8 @@ printmid() {
 
 jancox=/data/local/jancox-tool
 editor=$jancox/editor
-jancoxversion=2.2
-jancoxdate=17-07-2020
+jancoxversion=2.3
+jancoxdate=26-03-2021
 cd $jancox
 
 
@@ -89,7 +89,9 @@ YandexApp
 YandexBrowser
 Velvet
 facebook-installer
+FacebookAppManager
 LauncherRes
+FacebookInstaller
 "
 
 
@@ -102,7 +104,7 @@ LauncherRes
 menu(){
 	while true; do
 	clear
-	printmid "$BLUE $2 $GREEN"
+	printmid "${YELLOW} $2 ${GREEN}"
 	print
 	$1
 	print
@@ -126,30 +128,18 @@ debloating_auto (){
 	#debloating auto folder
 	for i1 in $(find $system -type d); do
 	  case $i1 in
-	   *priv-app)
+	   *priv-app | *app | *etc)
 	      for i2 in $listdebloatdir ; do
 	         if [ -d $i1/$i2 ]; then
-	         print "- Debloating $i2"
+	         print "- Debloating directory •> $i1/$i2"
+	         del $i1/$i2
+	         elif [ -f $i1/$i2 ]; then
+	         print "- Debloating file •> $i1/$i2"
 	         del $i1/$i2
 	         fi
 	      done
 	   ;;
-	   *app)
-	      for i2 in $listdebloatdir ; do
-	         if [ -d $i1/$i2 ]; then
-	         print "- Debloating $i2"
-	         del $i1/$i2
-	         fi
-	      done
-	   ;;
-   	*etc)
-	      for i2 in $listdebloatdir ; do
-	         if [ -d $i1/$i2 ]; then
-	         print "- Debloating $i2"
-	         del $i1/$i2
-	         fi
-	      done
-	   ;;
+	   
    	esac
 	done
   print "- Done"
@@ -179,19 +169,44 @@ sleep 3s
 esac
 done
 }
-dm_verity(){
-	
-	
+disable_dm_verity(){
+	if [[ "$(grep secure=0 $editor/vendor/default.prop)" ]]; then
+	print "- set secure=0 to secure=1 •> $editor/vendor/default.prop"
+	sed -i 's/'"secure=0"'/'"secure=1"'/g' $editor/vendor/default.prop
+	fi
+	if [[ "$(grep forceencrypt $editor/vendor/etc/fstab.qcom)" ]]; then
+	print "- set forceencrypt to encryptable •> $editor/vendor/etc/fstab.qcom"
+	sed -i 's/'"forceencrypt"'/'"encryptable"'/g' $editor/vendor/etc/fstab.qcom
+	fi
+	if [[ "$(grep forcefdeorfbe $editor/vendor/etc/fstab.qcom)" ]]; then
+	print "- set forcefdeorfbe to encryptable •> $editor/vendor/etc/fstab.qcom"
+	sed -i 's/'"forcefdeorfbe"'/'"encryptable"'/g' $editor/vendor/etc/fstab.qcom
+	fi
+	if [[ "$(grep fileencryption $editor/vendor/etc/fstab.qcom)" ]]; then
+	print "- set fileencryption to encryptable •> $editor/vendor/etc/fstab.qcom"
+	sed -i 's/'"fileencryption"'/'"encryptable"'/g' $editor/vendor/etc/fstab.qcom
+	fi
+	if [[ "$(grep .dmverity=true $editor/vendor/etc/fstab.qcom)" ]]; then
+	print "- set .dmverity=true to .dmverity=false •> $editor/vendor/etc/fstab.qcom"
+	sed -i 's/'".dmverity=true"'/'".dmverity=false"'/g' $editor/vendor/etc/fstab.qcom
+	fi
+	if [[ "$(grep fileencryption $editor/vendor/etc/fstab.qcom)" ]]; then
+	print "- set fileencryption to encryptable •> $editor/vendor/etc/fstab.qcom"
+	sed -i 's/'"fileencryption"'/'"encryptable"'/g' $editor/vendor/etc/fstab.qcom
+	fi
+	if [ -f $editor/$system/recovery-from-boot.p ]; then
+	print "- Removing •> $editor/$system/recovery-from-boot.p"
+	rm -rf $editor/$system/recovery-from-boot.p
+	fi
 	print " "
-	
-	
+	print "- Done"
 	}
 
 about (){
 #
 print "$CYAN "
 print "Jancox Tool Menu v$jancoxversion ($jancoxdate)"
-print "Copyright (C) 2020 wahyu kurniawan (wahyu6070)."
+print "Copyright (C) 2021 wahyu kurniawan (wahyu6070)."
 print "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>."
 print "This is free software: you are free to change and redistribute it."
 print "There is NO WARRANTY, to the extent permitted by law."
@@ -208,32 +223,28 @@ print " $GREEN"
 # Core menu
 #
 
-
-if [[ "$(grep secure=0 $editor/vendor/default.prop)" ]]; then dmverity=true;
-elif [[ "$(grep forceencrypt $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep forcefdeorfbe $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep fileencryption $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep .dmverity=true $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-elif [[ "$(grep fileencryption $editor/vendor/etc/fstab.qcom)" ]]; then dmverity=true;
-#elif [ -f $editor2/$system/recovery-from-boot.p ]; then dmverity=true;
+DMVERITY=false
+if [ -f $editor/vendor/build.prop ]; then
+	for GREP_VERITY in forceencrypt forcefdeorfbe fileencryption .dmverity=true fileencryption; do
+		[[ "$(grep $GREP_VERITY $editor/vendor/etc/fstab.qcom)" ]] && DMVERITY=true
+	done
+	[[ "$(grep secure=0 $editor2/vendor/default.prop)" ]] && DMVERITY=true;
+	#[ -f $editor2/$system/recovery-from-boot.p ] && DMVERITY=true;
 else
-dmverity=false
-fi;
-
+DMVERITY=false
+fi
 
 
 while true ; do
 clear
-print " "
-print "$GREEN";
-printmid "$CYAN Jancox ${VIOLET}Tool ${WHITE}Menu"$GREEN
-print " "
+printmid "${CYAN}Jancox ${VIOLET}Tool ${WHITE}Menu"
+print "$GREEN "
 print " "
 print "- Android Version = $(getp ro.build.version.release $editor2/$system/build.prop) "
 print "- Name ROM        = $(getp ro.build.display.id $editor2/$system/build.prop) "
-print "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
+[ -f $editor2/vendor/build.prop ] && print "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
 print "- System as-root  = $sysroot "
-print "- Dm-verity       = $dmverity "
+print "- Dm-verity       = $DMVERITY"
 print " "
 print "1.Debloating"
 print "2.Disable Dm-verity"
@@ -248,7 +259,7 @@ print " "
 debloating
 ;;
 2)
-print " "
+menu disable_dm_verity "Disable Dm-Verity"
 ;;
 3)
 menu about About

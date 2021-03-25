@@ -1,5 +1,5 @@
 #!/system/bin/sh
-#Jancox-tool Android
+#Jancox-tool-Android
 #by wahyu6070
 
 
@@ -15,7 +15,7 @@ pybin=$jancox/bin/python
 editor=$jancox/editor
 log=$jancox/bin/jancox.log
 loglive=$jancox/bin/jancox.live.log
-chmod -R 777 $bin
+chmod -R 755 $bin
 [ $(pwd) != $jancox ] && cd $jancox
 del $loglive && touch $loglive
 [ -d $tmp ] && del $tmp
@@ -26,9 +26,10 @@ if [ -f /data/data/com.termux/files/usr/bin/python ]; then
 py=/data/data/com.termux/files/usr/bin/python
 else
 printlog " "
-printlog "- python 3 Not Installed In Termux !"
+printlog "$- python 3 Not Installed In Termux !"
 printlog " "
 printlog "- apt update"
+printlog "- apt upgrade"
 printlog "- pkg install python"
 printlog " "
 sleep 1s
@@ -44,15 +45,15 @@ done
 clear
 [ ! -f $jancox/credits.txt ] && printlog "    Credits not found !!" | sleep 3s | exit ;
 
-printlog "                Jancox Tool by wahyu6070"
+printmid "${Y}Jancox Tool by wahyu6070${W}"
 printlog " "
-printlog "       Unpack "
+printlog "       Unpack"
 printlog " "
 if [ $input ]; then
 printlog "- Using input.zip from $input "
 else
-printlog "- Input.zip not found "
-printlog "- please add input.zip in /sdcard or $jancox/"
+printlog "${R}- Input.zip not found "
+printlog "- please add input.zip in /sdcard or $jancox/ ${W}"
 fi
 
 if [ $input ]; then
@@ -107,13 +108,12 @@ fi
 
 if [ -f $tmp/boot.img ]; then
 printlog "- Extraction boot.img"
-$bin/magiskboot unpack $tmp/boot.img 2>/dev/null
+$bin/magiskboot unpack $tmp/boot.img  2>> $loglive
 cdir $editor/boot
-[ -f $jancox/ramdisk.cpio ] && mv -f $jancox/ramdisk.cpio $editor/boot/
-[ -f $jancox/kernel ] && mv -f $jancox/kernel $editor/boot/
-[ -f $jancox/kernel_dtb ] && mv -f $jancox/kernel_dtb $editor/boot/
-[ -f $jancox/dtb ] && mv -f $jancox/dtb $editor/boot/
-[ -f $jancox/second ] && mv -f $jancox/kernel_dtb $editor/boot/
+for MV_BOOT in ramdisk.cpio kernel kernel_dtb dtb second; do
+[ -f $jancox/$MV_BOOT ] && mv -f $jancox/$MV_BOOT $editor/boot/
+sedlog "- Moving boot file $jancox/$MVBOOT to $editor/boot/"
+done
 fi
 
 [ -d $tmp/META-INF ] && mv -f $tmp/META-INF $editor

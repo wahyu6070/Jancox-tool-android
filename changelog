@@ -15,4 +15,6 @@ changelog
 - and other improvements
 2.3 25-03-2021
 - Using kopi installer (support magisk non magisk)
+- move zip compression 7z to zip
+-
 

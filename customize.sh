@@ -31,5 +31,5 @@ print " jancox --help"
 print " "
 
 chmod -R 755 /data/local/jancox-tool
-set_perm $MODPATH/system/bin/jancox 0 0 0755 0755
-set_perm $MODPATH/system/bin/jancoxmenu 0 0 0755 0755
+chmod 755 $MODPATH/system/bin/jancox
+chnod 755 $MODPATH/system/bin/jancoxmenu

@@ -157,18 +157,20 @@ system=system
 systemroot=false
 fi;
 
+test ! -f $editor2/$system/build.prop && return 1
+
 if [ -d $editor2/vendor ]; then
 	for GREP_VERITY in forceencrypt forcefdeorfbe fileencryption .dmverity=true fileencryption; do
-		[[ "$(grep $GREP_VERITY $editor2/vendor/etc/fstab.qcom)" ]] && DMVERITY=true
+		[[ "$(grep $GREP_VERITY $editor2/vendor/etc/fstab.qcom)" ]] && DMVERITY=true || DMVERITY=false
 	done
-	if [[ "$(grep secure=0 $editor2/vendor/default.prop)" ]]; then DMVERITY=true;
-	#elif [ -f $editor2/$system/recovery-from-boot.p ]; then DMVERITY=true;
+	[[ "$(grep secure=0 $editor2/vendor/default.prop)" ]] && DMVERITY=true;
+	#[ -f $editor2/$system/recovery-from-boot.p ] && DMVERITY=true;
 else
 DMVERITY=false
-fi;
+fi
 echo "- Android Version = $(getp ro.build.version.release $editor2/$system/build.prop) "
 echo "- Name ROM        = $(getp ro.build.display.id $editor2/$system/build.prop) "
-echo "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
+[ -f $editor2/vendor/build.prop ] && echo "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
 echo "- System as-root  = $systemroot "
 echo "- Dm-verity       = $DMVERITY "
 print " "
@@ -186,7 +188,7 @@ clog(){
 	#create log
 	sedlog "compress log"
 	cdir $jancox/bin/log
-	for $LOG1 in $jancox/bin/jancox.log $jancox/bin/jancox.live.log; do
+	for LOG1 in $jancox/bin/jancox.log $jancox/bin/jancox.live.log; do
 	   [ -f $LOG1 ] && cp -pf $LOG1 $jancox/bin/log/ || sedlog "Failed cp $LOG1"
 	done
 	if [ -f $editor/$system/build.prop ]; then
@@ -201,7 +203,7 @@ clog(){
 	if [ -f /vendor/build.prop ]; then
 		cp -pf /vendor/build.prop $jancox/bin/log/ven_device_build.prop || sedlog "Failed cp /vendor/build.prop"
 	fi
-	[ -f $jancox/bin/jancox_log.tar.7z ] && del $jancox/bin/jancox_log.tar.gz
+	[ -f $jancox/bin/jancox_log.tar.gz ] && del $jancox/bin/jancox_log.tar.gz
 	cd  $jancox/bin/log
 	$bin/busybox tar -cz -f $jancox/bin/jancox_log.tar.gz * || sedlog "Failed Creating jancox_log.tar.gz"
 	del $jancox/bin/log
@@ -215,3 +217,6 @@ ARCH32=x86
 else
 ARCH32=arm
 fi
+
+#func active
+bash_color

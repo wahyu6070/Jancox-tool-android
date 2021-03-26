@@ -194,9 +194,9 @@ disable_dm_verity(){
 	print "- set fileencryption to encryptable •> $editor/vendor/etc/fstab.qcom"
 	sed -i 's/'"fileencryption"'/'"encryptable"'/g' $editor/vendor/etc/fstab.qcom
 	fi
-	if [ -f $editor/$system/recovery-from-boot.p ]; then
+	if [ -f $system/recovery-from-boot.p ]; then
 	print "- Removing •> $editor/$system/recovery-from-boot.p"
-	rm -rf $editor/$system/recovery-from-boot.p
+	rm -rf $system/recovery-from-boot.p
 	fi
 	print " "
 	print "- Done"
@@ -287,7 +287,7 @@ change_name_rom
 menu about About
 ;;
 5)
-print"$WHITE"
+print "$WHITE"
 break
 ;;
 *)

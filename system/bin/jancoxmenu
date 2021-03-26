@@ -202,6 +202,24 @@ disable_dm_verity(){
 	print "- Done"
 	}
 
+change_name_rom(){
+	NAME_ROM=`getp ro.build.display.id $editor2/$system/build.prop`
+	clear
+	printmid "${YELLOW}Change Name Rom${GREEN}"
+	print " "
+	print "Name ROM = ${YELLOW}$NAME_ROM${GREEN}"
+	print
+	echo -n "New name ROM : ${VIOLET}"
+	read NEW_NAME_ROM
+	sed -i 's/'"ro.build.display.id=${NAME_ROM}"'/'"ro.build.display.id=${NEW_NAME_ROM}"'/g' $system/build.prop
+	print "${GREEN}•> Change name ${WHITE} : ${YELLOW}$NAME_ROM ${WHITE}to ${GREEN}$NEW_NAME_ROM"
+	print "Done"
+	print
+	print "${YELLOW}1.Back Menu${VIOLET}"
+	print
+	echo -n " Select Menu : ${YELLOW}"
+	read asw
+	}
 about (){
 #
 print "$CYAN "
@@ -240,18 +258,19 @@ clear
 printmid "${CYAN}Jancox ${VIOLET}Tool ${WHITE}Menu"
 print "$GREEN "
 print " "
-print "- Android Version = $(getp ro.build.version.release $editor2/$system/build.prop) "
-print "- Name ROM        = $(getp ro.build.display.id $editor2/$system/build.prop) "
+print "- Android Version = $(getp ro.build.version.release $system/build.prop) "
+print "- Name ROM        = $(getp ro.build.display.id $system/build.prop) "
 [ -f $editor2/vendor/build.prop ] && print "- Device          = $(getp ro.product.vendor.device $editor2/vendor/build.prop) "
 print "- System as-root  = $sysroot "
 print "- Dm-verity       = $DMVERITY"
 print " "
 print "1.Debloating"
 print "2.Disable Dm-verity"
-print "3.About"
-print "4.Exit"
+print "3.Change name ROM"
+print "4.About"
+print "5.Exit"
 print
-echo -n " Select menu : "
+echo -n " Select menu : $VIOLET"
 read menus
 case $menus in
 1)
@@ -262,9 +281,13 @@ debloating
 menu disable_dm_verity "Disable Dm-Verity"
 ;;
 3)
-menu about About
+change_name_rom
 ;;
 4)
+menu about About
+;;
+5)
+print"$WHITE"
 break
 ;;
 *)

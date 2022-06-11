@@ -10,36 +10,15 @@ print(){
 printlog(){
 	print "$1"
 	if [ "$1" != " " ]; then
-	print "$1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $log
-	print "$1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $loglive
+	print "$1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $LOG
 	else
-	print "$1" >> $log
-	print "$1" >> $loglive
+	print "$1" >> $LOG
 	fi
 	}
 sedlog(){
-	print "[Processing]  $1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $log
-	print "[Processing]  $1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $loglive
+	print "[Processing]  $1 [$(date '+%d/%m/%Y %H:%M:%S')]" >> $LOG
 	}
 	
-	
-#
-while_log(){
-	print "$1" | tee -a $log
-	}
-listlog(){
-	print " " >> $log
-	print "▒▒▒▒▒▒▒▒▒▒▒▒▒ Folder List : $1 ▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $log
-	print " " >> $loglive
-	print "▒▒▒▒▒▒▒▒▒▒▒▒▒ Folder List : $1 ▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $loglive
-	find "$1" -type f | while read lol; do
-	while_log "▒ $(du -sah $lol | cut -f 1) ▒ $lol"
-	done >> $loglive
-	print "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $log
-	print " " >> $log
-	print "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $loglive
-	print " " >> $loglive
-	}
 
 getp(){ grep "^$1" "$2" | head -n1 | cut -d = -f 2; }
 
@@ -135,9 +114,9 @@ N='\e[0m'			# How to use (example): echo "${G}example${N}"
 }
 
 abort(){
-	print " " | tee -a $log | tee -a $loglive
-	print "!!! $1" | tee -a $log | tee -a $loglive
-	print " " | tee -a $log | tee -a $loglive
+	print " " | tee -a $LOG
+	print "!!! $1" | tee -a $LOG
+	print " " | tee -a $LOG
 	exit 1
 	}
 	
@@ -176,47 +155,49 @@ echo "- Dm-verity       = $DMVERITY "
 print " "
 }
 
-
-clog(){
-	if [ -f $editor2/system/system/build.prop ]; then
-	system=system/system
-	systemroot=true
-	else
-	system=system
-	systemroot=false
-	fi;
-	#create log
-	sedlog "compress log"
-	cdir $jancox/bin/log
-	for LOG1 in $jancox/bin/jancox.log $jancox/bin/jancox.live.log; do
-	   [ -f $LOG1 ] && cp -pf $LOG1 $jancox/bin/log/ || sedlog "Failed cp $LOG1"
-	done
-	if [ -f $editor/$system/build.prop ]; then
-	    cp -pf $editor/$system/build.prop $jancox/bin/log/sys_rom_build.prop || sedlog "Failed cp $editor/$system/build.prop"
-	fi
-	if [ -f $editor/vendor/build.prop ]; then
-		cp -pf $editor/vendor/build.prop $jancox/bin/log/ven_rom_build.prop || sedlog "Failed cp /$editor/vendor/build.prop"
-	fi
-	if [ -f /system/build.prop ]; then
-		cp -pf /system/build.prop $jancox/bin/log/sys_device_build.prop || sedlog "Failed cp /system/build.prop"
-	fi
-	if [ -f /vendor/build.prop ]; then
-		cp -pf /vendor/build.prop $jancox/bin/log/ven_device_build.prop || sedlog "Failed cp /vendor/build.prop"
-	fi
-	[ -f $jancox/bin/jancox_log.tar.gz ] && del $jancox/bin/jancox_log.tar.gz
-	cd  $jancox/bin/log
-	$bin/busybox tar -cz -f $jancox/bin/jancox_log.tar.gz * || sedlog "Failed Creating jancox_log.tar.gz"
-	del $jancox/bin/log
-	cd $jancox
-	}
-	
 	
 #dec
-if [ $(uname -m) = *x86* ]; then
-ARCH32=x86
-else
-ARCH32=arm
-fi
+case $(uname -m) in
+aarch32 | armv7l) ARCH=arm
+;;
+aarch64 | armv8l) ARCH=arm64
+;;
+i386 | i486 |i586 | i686) ARCH=x86
+;;
+*x86_64*) ARCH=x86_64
+;;
+*) ERROR "Architecure not support <$(uname -m)>"
+;;
+esac
 
+ARCH=arm
 #func active
 bash_color
+
+
+#variable
+
+JANCOX=$JANCOX
+TMP=$JANCOX/bin/tmp
+TMP2=$JANCOX/bin/tmp2
+EDITOR=$JANCOX/editor
+LOG=$JANCOX/bin/jancox.log
+BIN=$JANCOX/bin/$ARCH
+BUSYBOX=$BIN/busybox
+PROFILE=$JANCOX/bin/jancox.prop
+chmod -R 755 $BIN
+
+
+if [ -f /data/data/com.termux/files/usr/bin/python ]; then
+	PYTHON=/data/data/com.termux/files/usr/bin/python
+else
+	printlog " "
+	printlog "- python 3 Not Installed In Termux !"
+	printlog " "
+	printlog "- apt update"
+	printlog "- apt upgrade"
+	printlog "- pkg install python"
+	printlog " "
+	exit 1
+fi
+

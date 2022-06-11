@@ -4,130 +4,132 @@
 
 
 #PATH
-jancox=`dirname "$(readlink -f $0)"`
+JANCOX=`dirname "$(readlink -f $0)"`
 #functions
-. $jancox/bin/arm/kopi
-#bin
-bin=$jancox/bin/$ARCH32
-bb=$bin/busybox
-tmp=$jancox/bin/tmp
-pybin=$jancox/bin/python
-editor=$jancox/editor
-log=$jancox/bin/jancox.log
-loglive=$jancox/bin/jancox.live.log
-chmod -R 755 $bin
-[ $(pwd) != $jancox ] && cd $jancox
-del $loglive && touch $loglive
-[ -d $tmp ] && del $tmp
-[ -d $editor ] && del $editor
-cdir $tmp
-cdir $editor
-if [ -f /data/data/com.termux/files/usr/bin/python ]; then
-py=/data/data/com.termux/files/usr/bin/python
-else
-printlog " "
-printlog "$- python 3 Not Installed In Termux !"
-printlog " "
-printlog "- apt update"
-printlog "- apt upgrade"
-printlog "- pkg install python"
-printlog " "
-sleep 1s
-exit
-fi
+chmod 755 $JANCOX/bin/jancox_functions
+. $JANCOX/bin/jancox_functions
+
+[ $(pwd) != $JANCOX ] && cd $JANCOX
+
+for T in $TMP $TMP2 $EDITOR; do
+	 [ -d $T ] && del $T && cdir $T || cdir $T
+done
+
 #input.zip
-for ajax in $jancox /data/media/0 /data/media/0/Download; do
+for ajax in $JANCOX /data/media/0 /data/media/0/Download; do
      if [ -f $ajax/input.zip ]; then
-        input=$ajax/input.zip
+        INPUT=$ajax/input.zip
         break
      fi;
 done
 clear
-[ ! -f $jancox/credits.txt ] && printlog "    Credits not found !!" | sleep 3s | exit ;
+[ ! -f $JANCOX/credits.txt ] && printlog "    Credits not found !!" | sleep 3s | exit ;
 
 printmid "${Y}Jancox Tool by wahyu6070${W}"
 printlog " "
 printlog "       Unpack"
 printlog " "
-if [ $input ]; then
-printlog "- Using input.zip from $input "
+if [ $INPUT ]; then
+	printlog "- Using input.zip from $INPUT "
 else
-printlog "${R}- Input.zip not found "
-printlog "- please add input.zip in /sdcard or $jancox/ ${W}"
+	printlog "${R}- Input.zip not found "
+	printlog "- please add input.zip in /sdcard or $JANCOX/ ${W}"
 fi
 
-if [ $input ]; then
-printlog "- Extracting input.zip..."
-$bin/unzip -o $input -d $tmp >> $loglive
-listlog "$tmp"
+if [ $INPUT ]; then
+	printlog "- Extracting input.zip..."
+	$BIN/unzip -o $INPUT -d $TMP >> $LOG
 fi
 
-if [ -f $tmp/*.bin ]; then
-printlog "- Extracting Payload.bin"
-$py $pybin/payload_dumper.py $tmp/*.bin --out $tmp >> $loglive
-payloadbin=true
+
+if [ -f $TMP/*.bin ]; then
+	printlog "- Extracting Payload.bin"
+	$PYTHON $pybin/payload_dumper.py $tmp/*.bin --out $tmp >> $LOG
+	payloadbin=true
 fi
 
-if [ -f $tmp/system.new.dat.br ]; then
-printlog "- Extraction system.new.dat.br... "
-$bin/brotli -d $tmp/system.new.dat.br -o $tmp/system.new.dat
-del $tmp/system.new.dat.br $tmp/system.patch.dat
+if [ -f $TMP/system.new.dat.br ]; then
+	printlog "- Extraction system.new.dat.br... "
+	$BIN/brotli -d $TMP/system.new.dat.br -o $TMP2/system.new.dat
 fi
 
-if [ -f $tmp/vendor.new.dat.br ]; then
-printlog "- Extraction vendor.new.dat.br... "
-$bin/brotli -d $tmp/vendor.new.dat.br -o $tmp/vendor.new.dat
-del $tmp/vendor.new.dat.br $tmp/vendor.patch.dat
+if [ -f $TMP/product.new.dat.br ]; then
+	printlog "- Extraction product.new.dat.br... "
+	$BIN/brotli -d $TMP/product.new.dat.br -o $TMP2/product.new.dat
 fi
 
-if [ -f $tmp/system.new.dat ]; then
-printlog "- Extraction system.new.dat... "
-$py $pybin/sdat2img.py $tmp/system.transfer.list $tmp/system.new.dat $tmp/system.img >> $loglive
-del $tmp/system.new.dat $tmp/system.transfer.list
+if [ -f $TMP/system_ext.new.dat.br ]; then
+	printlog "- Extraction system_ext.new.dat.br... "
+	$BIN/brotli -d $TMP/system_ext.new.dat.br -o $TMP2/system_ext.new.dat
 fi
 
-if [ -f $tmp/vendor.new.dat ]; then
-printlog "- Extraction vendor.new.dat... "
-$py $pybin/sdat2img.py $tmp/vendor.transfer.list $tmp/vendor.new.dat $tmp/vendor.img >> $loglive
-del $tmp/vendor.new.dat $tmp/vendor.transfer.list
+if [ -f $TMP/vendor.new.dat.br ]; then
+	printlog "- Extraction vendor.new.dat.br... "
+	$BIN/brotli -d $TMP/vendor.new.dat.br -o $TMP2/vendor.new.dat
 fi
 
-[ -d $jancox/editor ] && rm -rf $editor
-mkdir -p $editor
-if [ -f $tmp/system.img ]; then
-printlog "- Extraction system.img... "
-$py $pybin/imgextractor.py $tmp/system.img $editor/system >> $loglive
-del $tmp/system.img
+if [ -f $TMP2/system.new.dat ]; then
+	printlog "- Extraction system.new.dat... "
+	$PYTHON $JANCOX/bin/sdat2img/sdat2img.py $TMP/system.transfer.list $TMP2/system.new.dat $TMP2/system.img >> $LOG
+	del $TMP2/system.new.dat
 fi
 
-if [ -f $tmp/vendor.img ]; then
-printlog "- Extraction vendor.img... "
-$py $pybin/imgextractor.py $tmp/vendor.img $editor/vendor >/dev/null
-del $tmp/vendor.img
+if [ -f $TMP2/product.new.dat ]; then
+	printlog "- Extraction product.new.dat... "
+	$PYTHON $JANCOX/bin/sdat2img/sdat2img.py $TMP/product.transfer.list $TMP2/product.new.dat $TMP2/product.img >> $LOG
+	del $TMP2/product.new.dat
 fi
 
-if [ -f $tmp/boot.img ]; then
-printlog "- Extraction boot.img"
-$bin/magiskboot unpack $tmp/boot.img  2>> $loglive
-cdir $editor/boot
-for MV_BOOT in ramdisk.cpio kernel kernel_dtb dtb second; do
-[ -f $jancox/$MV_BOOT ] && mv -f $jancox/$MV_BOOT $editor/boot/
-sedlog "- Moving boot file $jancox/$MVBOOT to $editor/boot/"
-done
+if [ -f $TMP2/system_ext.new.dat ]; then
+	printlog "- Extraction system_ext.new.dat... "
+	$PYTHON $JANCOX/bin/sdat2img/sdat2img.py $TMP/system_ext.transfer.list $TMP2/system_ext.new.dat $TMP2/system_ext.img >> $LOG
+	del $TMP2/system_ext.new.dat
 fi
 
-[ -d $tmp/META-INF ] && mv -f $tmp/META-INF $editor
-[ -d $tmp/system ] && mv -f $tmp/system $editor/system2
-[ -d $tmp/firmware-update ] && mv -f $tmp/firmware-update $editor
-[ -d $tmp/install ] && mv -f $tmp/install $editor
-[ -f $tmp/boot.img ] && mv $tmp/boot.img $editor/boot
-[ -f $tmp/compatibility.zip ] && mv $tmp/compatibility.zip $editor
-[ -f $tmp/system_file_contexts ] && mv -f $tmp/system_file_contexts $editor/system_file_contexts
-[ -f $tmp/vendor_file_contexts ] && mv -f $tmp/vendor_file_contexts $editor/vendor_file_contexts
-[ -f $tmp/system_fs_config ] && mv -f $tmp/system_fs_config $editor/system_fs_config
-[ -f $tmp/vendor_fs_config ] && mv -f $tmp/vendor_fs_config $editor/vendor_fs_config
+if [ -f $TMP2/vendor.new.dat ]; then
+	printlog "- Extraction vendor.new.dat... "
+	$PYTHON $JANCOX/bin/sdat2img/sdat2img.py $TMP/vendor.transfer.list $TMP2/vendor.new.dat $TMP2/vendor.img >> $LOG
+	del $TMP2/vendor.new.dat
+fi
 
-test $payloadbin && del $tmp
+[ -d $EDITOR ] && del $EDITOR
+cdir $EDITOR
+
+if [ -f $TMP2/system.img ]; then
+	printlog "- Extraction system.img... "
+	$PYTHON $JANCOX/bin/imgextractor/imgextractor.py $TMP2/system.img $EDITOR/system >> $LOG
+	del $TMP2/system.img
+fi
+
+if [ -f $TMP2/product.img ]; then
+	printlog "- Extraction product.img... "
+	$PYTHON $JANCOX/bin/imgextractor/imgextractor.py $TMP2/product.img $EDITOR/product >> $LOG
+	del $TMP2/product.img
+fi
+
+if [ -f $TMP2/system_ext.img ]; then
+	printlog "- Extraction system.img... "
+	$PYTHON $JANCOX/bin/imgextractor/imgextractor.py $TMP2/system_ext.img $EDITOR/system_ext >> $LOG
+	del $TMP2/system_ext.img
+fi
+
+if [ -f $TMP/vendor.img ]; then
+	printlog "- Extraction vendor.img... "
+	$PYTHON $JANCOX/bin/imgextractor/imgextractor.py $TMP2/vendor.img $EDITOR/vendor >> $LOG
+	del $TMP2/vendor.img
+fi
+
+if [ -f $TMP/boot.img ]; then
+	printlog "- Extraction boot.img"
+	$BIN/magiskboot unpack $TMP/boot.img >> $LOG
+	cdir $EDITOR/boot
+	for MV_BOOT in ramdisk.cpio kernel kernel_dtb dtb second; do
+		[ -f $JANCOX/$MV_BOOT ] && mv -f $JANCOX/$MV_BOOT $EDITOR/boot/
+		sedlog "- Moving boot file $JANCOX/$MVBOOT to $EDITOR/boot/"
+	done
+fi
+
+#test $payloadbin && del $tmp
 
 if [ -f $editor/system/build.prop ]; then
 printlog "- Done "

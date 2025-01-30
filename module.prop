@@ -4,5 +4,5 @@ version=2.4
 versionCode=24
 date=01-02-2025
 author=wahyu6070@litegapps.com
-updateJson=https://raw.githubusercontent.com/litegapps/updater/main/core/litegapps/lite/arm64/35/update.json
+updateJson=https://raw.githubusercontent.com/wahyu6070/Jancox-tool-android/refs/heads/master/update.json
 description=Jancox tool is a tool for unpack/repack ROMs.

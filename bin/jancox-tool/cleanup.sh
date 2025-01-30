@@ -16,6 +16,10 @@ print "- Cleaning"
 for RM_DIR in editor; do
 [ -d $jancox/$RM_DIR ] && del $jancox/$RM_DIR && print "   Removing •> $jancox/$RM_DIR"
 done
+for SYS in system product system_ext vendor; do
+	print "- umount •> $jancox/editor/$SYS"
+	umount -f $jancox/editor/$SYS
+done
 for RM_FILES in $(ls -1 $jancox); do
 	case "$RM_FILES" in
 		*new-rom*)

@@ -7,7 +7,6 @@ print "| By              : $AUTHOR"
 print "|___________________________________"
 print "|"
 print "| Telegram Group  : https://t.me/wahyu6070group"
-print "| Youtube         : www.youtube.com/c/wahyu6070"
 print "|___________________________________"
 
 if [ -d /data/data/com.termux ]; then

@@ -51,15 +51,12 @@ fi
 
 if [ -d $editor/system ]; then
 printlog "- Repack system"
-size1=`$bb du -sk $editor/system | $bb awk '{$1*=1024;$1=int($1*1.05);printf $1}'`
-$bin/make_ext4fs -s -L system -T 2009110000 -S $editor/system_file_contexts -C $editor/system_fs_config -l $size1 -a system $tmp/system.img $editor/system/ >> $loglive
-sedlog "system size = $size1"
+umount -l $editor/system
 fi
 
 if [ -d $editor/vendor ]; then
 printlog "- Repack vendor"
-size2=`$bb du -sk $editor/vendor | $bb awk '{$1*=1024;$1=int($1*1.05);printf $1}'`
-$bin/make_ext4fs -s -L vendor -T 2009110000 -S $editor/vendor_file_contexts -C $editor/vendor_fs_config -l $size2 -a vendor $tmp/vendor.img $editor/vendor/ >> $loglive
+umount -l $editor/vendor
 sedlog "vendor size = $size2"
 fi;
 
@@ -110,13 +107,6 @@ test -f $jancox/$RM_BOOT_FILES && rm -rf $jancox/$RM_BOOT_FILES
 sedlog "- Removing boot file $janxoz$RM_BOOT_FILES"
 done
 fi
-
-[ -d $editor/META-INF ] && cp -a $editor/META-INF $tmp/
-[ -d $editor/install ] && cp -a $editor/install $tmp/
-[ -d $editor/system2 ] && cp -a $editor/system2 $tmp/system
-[ -d $editor/firmware-update ] && cp -a $editor/firmware-update $tmp/
-[ -f $editor/compatibility.zip ] && cp -f $editor/compatibility.zip $tmp/
-[ -f $editor/compatibility_no_nfc.zip ] && cp -f $editor/compatibility_no_nfc.zip $tmp/
 
 if [ -d $tmp/META-INF ] && [ $(getp zipping $profile) = true ]; then
 printlog "- Zipping"

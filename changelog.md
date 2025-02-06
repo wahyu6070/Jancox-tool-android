@@ -1,4 +1,8 @@
 # changelog
+## 2.3 25-03-2021
+- Using kopi installer (support magisk non magisk)
+- move zip compression 7z to zip
+
 ## 2.2 12-08-2020
 - Fix unzip magic
 - Supported bin payload (Asus Ota)
@@ -10,10 +14,6 @@
 - Added debloater
 - and other improvements
 
-## 2.3 25-03-2021
-- Using kopi installer (support magisk non magisk)
-- move zip compression 7z to zip
--
 ## 2.1 05-05-2020
 - Fix Repack error
 - Fix exe not copying in termux

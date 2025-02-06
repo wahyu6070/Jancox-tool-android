@@ -6,9 +6,9 @@
 #PATH
 jancox=`dirname "$(readlink -f $0)"`
 #functions
-. $jancox/bin/arm/kopi
+. $jancox/bin/functions
 #bin
-bin=$jancox/bin/$ARCH32
+bin=$jancox/bin/$ARCH
 bb=$bin/busybox
 tmp=$jancox/bin/tmp
 tmp3=$jancox/bin/tmp3
@@ -137,10 +137,9 @@ if [ -f $tmp3/vendor.new.dat ]; then
 	$bin/brotli -$brlvl -j -w 24 $tmp3/vendor.new.dat >> $loglive
 fi
 
-sleep 10s
 if [ -d $tmp3/META-INF ] && [ $(getp zipping $profile) = true ]; then
 	printlog "- Zipping"
-	ZIPNAME=`echo "NewRom-$(date +%Y-%m-%d)"`
+	ZIPNAME="NewROM-$(date +%Y%m%d-%H%M%S)"
 	if [ "$(getp zip.level $jancox/bin/jancox.prop)" -le 9 ]; then
 	ZIPLEVEL=`getp zip.level $jancox/bin/jancox.prop`
 	else
@@ -148,7 +147,7 @@ if [ -d $tmp3/META-INF ] && [ $(getp zipping $profile) = true ]; then
 	fi
 	[ -f ${ZIPNAME}.zip ] && del ${ZIPNAME}.zip
 	cd $tmp3
-	$bin/zip -r${ZIPLEVEL} $jancox/"${ZIPNAME}.zip" * #>> $loglive || sedlog "Failed creating $jancox/${zipname}.zip"
+	ZIP -r${ZIPLEVEL} $jancox/"${ZIPNAME}.zip" * #>> $loglive || sedlog "Failed creating $jancox/${zipname}.zip"
 	sedlog "ZIP NAME  : ${ZIPNAME}.zip"
 	sedlog "ZIP LEVEL : ${ZIPLEVEL}"
 	cd $jancox

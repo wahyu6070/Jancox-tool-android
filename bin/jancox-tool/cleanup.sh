@@ -6,7 +6,7 @@
 #PATH
 jancox=`dirname "$(readlink -f $0)"`
 #functions
-. $jancox/bin/arm/kopi
+. $jancox/bin/functions
 clear
 printmid "${Y}Jancox Tool by wahyu6070${W}"
 print " "

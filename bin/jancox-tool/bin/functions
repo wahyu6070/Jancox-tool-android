@@ -1,8 +1,4 @@
-####################################
-#         Kopi Functions           #
-####################################
-#          By : wahyu6070          #
-####################################
+
 print(){
 	echo "$1"
 	}
@@ -27,6 +23,12 @@ sedlog(){
 while_log(){
 	print "$1" | tee -a $log
 	}
+ERROR(){
+	printlog "[ERROR] <$1>"
+	[ -d $tmp ] && del $tmp
+	exit 1
+	}
+	
 listlog(){
 	print " " >> $log
 	print "▒▒▒▒▒▒▒▒▒▒▒▒▒ Folder List : $1 ▒▒▒▒▒▒▒▒▒▒▒▒▒" >> $log
@@ -42,39 +44,6 @@ listlog(){
 	}
 
 getp(){ grep "^$1" "$2" | head -n1 | cut -d = -f 2; }
-
-loadings() {
-  PID=$!
-  a=0;
-  while [ -d /proc/$PID ]; do
-    b=$((+1))
-    a=$((a+1))
-    sleep 0.9s
-    printf "\r${@} [${a}Second]"
-  done
-}
-
-loadingm() {
-  PID=$!
-  a=0
-  while [ -d /proc/$PID ]; do
-    b=$((a+1))
-    a=$((h+1))
-    sleep 59.9s
-    printf "\r${@} [${b}Minutes]"
-  done
-}
-
-loadingz() {
-  PID=$!
-  a=0
-  while [ -d /proc/$PID ]; do
-    b=$((a+1))
-    a=$((a+1))
-    sleep 0.9s
-    printf "#"
-  done
-}
 
 printmid() {
   local CHAR=$(printf "$@" | sed 's|\\e[[0-9;]*m||g' | wc -m)
@@ -106,6 +75,19 @@ abort(){
 	exit 1
 	}
 	
+#dec
+case $(uname -m) in
+aarch32 | armv7l) ARCH=arm
+;;
+aarch64 | armv8l) ARCH=arm64
+;;
+i386 | i486 |i586 | i686) ARCH=x86
+;;
+*x86_64*) ARCH=x86_64
+;;
+*) ERROR "Architecure not support <$(uname -m)>"
+;;
+esac
 #
 del (){ rm -rf "$@"; }
 cdir (){ mkdir -p "$@"; }
@@ -131,6 +113,21 @@ echo "- System as-root  = $systemroot "
 print " "
 }
 
+check_exec() {
+    local input="$1"
+    local bin="/data/data/com.termux/files/usr/bin"
+
+    if [ -f "$bin/$input" ]; then
+        echo "$bin/$input"
+        return 0
+    elif command -v "$input" >/dev/null 2>&1; then
+        command -v "$input"
+        return 0
+    else
+        echo "[!] Executable <$input> is not installed" >&2
+        exit 1
+    fi
+}
 
 clog(){
 	if [ -f $editor2/system/system/build.prop ]; then
@@ -165,13 +162,26 @@ clog(){
 	cd $jancox
 	}
 	
-	
-#dec
-if [ $(uname -m) = *x86* ]; then
-ARCH32=x86
-else
-ARCH32=arm
-fi
+
 
 #func active
 bash_color
+BROTLI (){
+	local EX=`check_exec brotli`
+	sedlog "[exec] $EX"
+	$EX "$@"  >> $loglive
+	}
+ZIP(){
+	local EX=`check_exec zip`
+	sedlog "[exec] $EX"
+	$EX "$@" >> $loglive
+	
+	}
+UNZIP(){
+	local EX=`check_exec unzip`
+	local IN=$1
+	local OUT=$2
+	sedlog "[exec] $EX"
+	$EX -o $IN -d $OUT  >> $loglive
+	
+	}

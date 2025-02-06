@@ -6,9 +6,9 @@
 #PATH
 jancox=`dirname "$(readlink -f $0)"`
 #functions
-. $jancox/bin/arm/kopi
+. $jancox/bin/functions
 #bin
-bin=$jancox/bin/$ARCH32
+bin=$jancox/bin/$ARCH
 bb=$bin/busybox
 tmp=$jancox/bin/tmp
 pybin=$jancox/bin/python
@@ -70,9 +70,9 @@ printlog "- please add input.zip in /sdcard or $jancox/ ${W}"
 fi
 
 if [ $input ]; then
-printlog "- Extracting input.zip..."
-$bin/unzip -o $input -d $tmp >> $loglive
-listlog "$tmp"
+	printlog "- Extracting input.zip..."
+	UNZIP $input $tmp
+	listlog "$tmp"
 fi
 
 if [ -f $tmp/*.bin ]; then
@@ -83,25 +83,25 @@ fi
 
 if [ -f $tmp/system.new.dat.br ]; then
 	printlog "- Extraction system.new.dat.br... "
-	$bin/brotli -d $tmp/system.new.dat.br -o $tmp/system.new.dat
+	BROTLI -d $tmp/system.new.dat.br -o $tmp/system.new.dat
 	del $tmp/system.new.dat.br $tmp/system.patch.dat
 fi
 
 if [ -f $tmp/product.new.dat.br ]; then
 	printlog "- Extraction product.new.dat.br... "
-	$bin/brotli -d $tmp/product.new.dat.br -o $tmp/product.new.dat
+	BROTLI -d $tmp/product.new.dat.br -o $tmp/product.new.dat
 	del $tmp/product.new.dat.br $tmp/product.patch.dat
 fi
 
 if [ -f $tmp/system_ext.new.dat.br ]; then
 	printlog "- Extraction system_ext.new.dat.br... "
-	$bin/brotli -d $tmp/system_ext.new.dat.br -o $tmp/system_ext.new.dat
+	BROTLI -d $tmp/system_ext.new.dat.br -o $tmp/system_ext.new.dat
 	del $tmp/system_ext.new.dat.br $tmp/system_ext.patch.dat
 fi
 
 if [ -f $tmp/vendor.new.dat.br ]; then
 	printlog "- Extraction vendor.new.dat.br... "
-	$bin/brotli -d $tmp/vendor.new.dat.br -o $tmp/vendor.new.dat
+	BROTLI -d $tmp/vendor.new.dat.br -o $tmp/vendor.new.dat
 	del $tmp/vendor.new.dat.br $tmp/vendor.patch.dat
 fi
 
@@ -164,14 +164,14 @@ fi
 test $payloadbin && del $tmp
 
 if [ -f $editor/system/build.prop ]; then
-printlog "- Done "
-printlog " "
-rom-info $editor > $editor/rom-info
+	printlog "- Done "
+	printlog " "
+	rom-info $editor > $editor/rom-info
 elif [ -f $editor/system/system/build.prop ]; then
-printlog "- Done"
-printlog " "
-rom-info $editor > $editor/rom-info
-cat $editor/rom-info
+	printlog "- Done"
+	printlog " "
+	rom-info $editor > $editor/rom-info
+	cat $editor/rom-info
 else
-printlog "- Finished with the problem"
+	printlog "- Finished with the problem"
 fi

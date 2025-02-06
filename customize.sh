@@ -31,4 +31,4 @@ print " "
 
 chmod -R 755 /data/local/jancox-tool
 chmod 755 $MODPATH/system/bin/jancox
-chnod 755 $MODPATH/system/bin/jancoxmenu
+

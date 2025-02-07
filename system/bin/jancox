@@ -43,7 +43,7 @@ print "example : jancox unpack"
 print " "
 print "Note : You must change your ROM to (input.zip), then move it to $jancox or /sdcard"
 print " "
-print "Jancox Tool 2.3 2019-10-03 2021-03-26 by wahyu6070"
+print "Jancox Tool 2.5 2019-10-03 2025-02-08 by wahyu6070"
 print " "
 ;;
 *) cd $jancox ;su;

@@ -27,7 +27,7 @@ done
 
 for RM_FILES in $(ls -1 $jancox); do
 	case "$RM_FILES" in
-		*new-rom*)
+		*NewROM*)
 			print "   Removing •> $jancox/$RM_FILES"
 			rm -rf $jancox/$RM_FILES
 			;;

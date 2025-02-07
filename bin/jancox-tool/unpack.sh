@@ -8,15 +8,8 @@ jancox=`dirname "$(readlink -f $0)"`
 #functions
 . $jancox/bin/functions
 #bin
-bin=$jancox/bin/$ARCH
-bb=$bin/busybox
-tmp=$jancox/bin/tmp
-pybin=$jancox/bin/python
-editor=$jancox/editor
-log=$jancox/bin/jancox.log
-loglive=$jancox/bin/jancox.live.log
 chmod -R 755 $bin
-if [ -f $jancox/bin/unpack.prop ]; then
+if [[ -f $jancox/bin/unpack.prop ]] && [[ ! $(getp payload $jancox/bin/unpack.prop) = "true" ]]; then
 	printlog "[!] Already unpacked <cleanup.sh to reunpack>"
 	for TMP_IMG in system product system_ext vendor; do
 		if [ -f $tmp/${TMP_IMG}.img ] && ! mount | grep -q $editor/$TMP_IMG; then
@@ -77,8 +70,8 @@ fi
 
 if [ -f $tmp/*.bin ]; then
 	printlog "- Extracting Payload.bin"
-	$py $pybin/payload_dumper.py $tmp/*.bin --out $tmp >> $loglive
-	payloadbin=true
+	PAYLOAD -output $tmp $tmp/*.bin >> $loglive
+	echo "payload=true" >> $jancox/bin/unpack.prop
 fi
 
 if [ -f $tmp/system.new.dat.br ]; then
@@ -134,34 +127,25 @@ fi
 [ -d $jancox/editor ] && rm -rf $editor
 mkdir -p $editor
 
-if [ -f $tmp/system.img ]; then
-	printlog "- Extraction system.img... "
-	mkdir -p $editor/system
-	mount -o loop $tmp/system.img $editor/system
+if [[ "$(getp payload $jancox/bin/unpack.prop)" == "true" ]]; then
+	
+	for SBIN in system vendor product system_ext; do
+		if [ -f $tmp/${SBIN}.img ]; then
+			printlog "- Extraction $SBIN.img... "
+			mkdir -p $editor/$SBIN
+			$py $pybin/imgextractor/imgextractor.py $tmp/${SBIN}.img $editor/$SBIN
+		fi
+	done
+else
+	for SBIN in system vendor product system_ext; do
+		if [ -f $tmp/${SBIN}.img ]; then
+			printlog "- Mounting ${SBIN}.img... "
+			mkdir -p $editor/$SBIN
+			mount -o loop $tmp/${SBIN}.img $editor/${SBIN}
+		fi
+	done
 fi
 
-
-if [ -f $tmp/product.img ]; then
-	printlog "- Extraction product.img... "
-	mkdir -p $editor/product
-	mount -o loop $tmp/product.img $editor/product
-fi
-
-if [ -f $tmp/system_ext.img ]; then
-	printlog "- Extraction system_ext.img... "
-	mkdir -p $editor/system_ext
-	mount -o loop $tmp/system_ext.img $editor/system_ext
-fi
-
-
-if [ -f $tmp/vendor.img ]; then
-	printlog "- Extraction vendor.img... "
-	mkdir -p $editor/vendor
-	mount -o loop $tmp/vendor.img $editor/vendor
-fi
-
-
-test $payloadbin && del $tmp
 
 if [ -f $editor/system/build.prop ]; then
 	printlog "- Done "

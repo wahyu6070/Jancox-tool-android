@@ -8,21 +8,17 @@ jancox=`dirname "$(readlink -f $0)"`
 #functions
 . $jancox/bin/functions
 #bin
-bin=$jancox/bin/$ARCH
-bb=$bin/busybox
-tmp=$jancox/bin/tmp
-tmp3=$jancox/bin/tmp3
-pybin=$jancox/bin/python
-editor=$jancox/editor
-profile=$jancox/bin/jancox.prop
-log=$jancox/bin/jancox.log
-loglive=$jancox/bin/jancox.live.log
+
 chmod -R 755 $bin
 
 
 clear
 [ $(pwd) != $jancox ] && cd $jancox
 del $loglive && touch $loglive
+if [[ $(getp payload $jancox/bin/unpack.prop) = "true" ]]; then
+printlog "[!] you did unpack payload ! does not support repack"
+exit 0
+fi
 mkdir -p $tmp
 mkdir -p $editor
 if [ -f /data/data/com.termux/files/usr/bin/img2simg ]; then

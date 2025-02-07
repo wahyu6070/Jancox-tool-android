@@ -92,6 +92,15 @@ esac
 del (){ rm -rf "$@"; }
 cdir (){ mkdir -p "$@"; }
 
+bin=$jancox/bin/$ARCH
+bb=$bin/busybox
+tmp=$jancox/bin/tmp
+pybin=$jancox/bin/python
+editor=$jancox/editor
+log=$jancox/bin/jancox.log
+loglive=$jancox/bin/jancox.live.log
+tmp3=$jancox/bin/tmp3
+profile=$jancox/bin/jancox.prop
 
 #jancox
 rom-info (){
@@ -115,9 +124,13 @@ print " "
 
 check_exec() {
     local input="$1"
-    local bin="/data/data/com.termux/files/usr/bin"
+    local termuxbin="/data/data/com.termux/files/usr/bin"
 
-    if [ -f "$bin/$input" ]; then
+    
+    if [ -f "$termuxbin/$input" ]; then
+        echo "$termuxbin/$input"
+        return 0
+    elif [ -f "$bin/$input" ]; then
         echo "$bin/$input"
         return 0
     elif command -v "$input" >/dev/null 2>&1; then
@@ -175,6 +188,12 @@ ZIP(){
 	local EX=`check_exec zip`
 	sedlog "[exec] $EX"
 	$EX "$@" >> $loglive
+	
+	}
+PAYLOAD(){
+	local EX=`check_exec payload`
+	sedlog "[exec] $EX"
+	$EX "$@"  #>> $loglive
 	
 	}
 UNZIP(){

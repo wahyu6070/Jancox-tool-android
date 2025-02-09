@@ -1,4 +1,13 @@
 # changelog
+## 2.5
+- Fix zip failed in 64bit arch
+- Add support 32/64bit arch
+- Move using payload dumper go
+- Fix img extractor issue payload.bin
+-_Update Binary : busybox,brotli,zip,unzip
+- Payload is not support repack
+- Change rename zip rom
+
 ## 2.3 25-03-2021
 - Using kopi installer (support magisk non magisk)
 - move zip compression 7z to zip
